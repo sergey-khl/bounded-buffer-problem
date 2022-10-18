@@ -31,9 +31,13 @@ void checkArgs(int argc, char **argv, int &numThreads, int &logId) {
     }
 }
 
-void processTransaction(int simulate, queue<int> &transactions) {
-    transactions.push(simulate);
-
+void *processTransaction(void *arg) {
+    //int simulate, queue<int> &transactions
+    //transactions.push(simulate);
+    Trans((long)arg);
+    
+    
+    return(0);
 }
 
 void parentSleep(int time) {

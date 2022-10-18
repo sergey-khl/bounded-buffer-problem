@@ -15,7 +15,6 @@ int TransSave = 0;
 
 void Trans( int n ) {
 	long i, j;
-
 	// Use CPU cycles 
 	j = 0;
 	for( i = 0; i < n * 100000; i++ ) {

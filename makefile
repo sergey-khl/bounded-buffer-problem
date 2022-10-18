@@ -1,5 +1,5 @@
 prodcon: main.o helper.o
-	g++ -g -o prodcon main.o helper.o 
+	g++ -g -o prodcon main.o helper.o -lpthread
 
 helper.o: helper.cpp helper.h
 	g++ -c helper.cpp -o helper.o
