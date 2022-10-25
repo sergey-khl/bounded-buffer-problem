@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <queue>
+#include <pthread.h>
 
 #include "helper.h"
 #include "tands.c"
@@ -32,8 +33,8 @@ void checkArgs(int argc, char **argv, int &numThreads, int &logId) {
 }
 
 void *processTransaction(void *arg) {
-    //int simulate, queue<int> &transactions
-    //transactions.push(simulate);
+    
+    // pthread_mutex_lock(&sem)
     Trans((long)arg);
     
     

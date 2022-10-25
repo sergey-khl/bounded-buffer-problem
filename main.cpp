@@ -10,8 +10,9 @@
 
 using namespace std;
 
-
 int main(int argc, char **argv) {
+    
+
     int numThreads, logId;
     // validate args and get number of w
     checkArgs(argc, argv, numThreads, logId);
@@ -33,15 +34,18 @@ int main(int argc, char **argv) {
             long arg = stoi(cmd.substr(1));
             if (pthread_create(&tid, NULL, processTransaction, (void *) arg) != 0) {
                 perror("could not create thread");
+                continue;
             }
+            transactions.push(tid);
             if (pthread_join(tid, NULL) == 0) {
                 cout << tid << " ended" << endl;
             } else {
                 cout << "failed to wait thread" << endl;
             }
-        }
-        if (cmd[0] == 'S') {
+        } else if (cmd[0] == 'S') {
             parentSleep(stoi(cmd.substr(1)));
+        } else {
+            cout << "please enter a valid command" << endl;
         }
     }
 
