@@ -11,4 +11,4 @@ main.o: main.cpp
 	g++ -c main.cpp -o main.o
 
 clean:
-	rm ./*o ./prodcon
+	rm ./*o ./*log ./prodcon

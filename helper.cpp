@@ -10,7 +10,6 @@
 
 #include "transcont.h"
 #include "helper.h"
-#include "tands.c"
 
 using namespace std;
 
@@ -18,18 +17,18 @@ mutex sigmtx;
 condition_variable sig;
 TransCont transCont;
 
-void checkArgs(int argc, char **argv, int &numThreads, int &logId) {
+void checkArgs(int argc, char **argv, int &numThreads, string &logId) {
     if (argc == 3) {
         try {
             numThreads = stoi(argv[1]);
-            logId = stoi(argv[2]);
+            logId = argv[2];
         } catch (...) {
             cout << "incorrect calling arguments" << endl;
         }
     } else if (argc == 2) {
         try {
             numThreads = stoi(argv[1]);
-            logId = 0;
+            logId = "";
         } catch (...) {
             cout << "incorrect calling arguments" << endl;
         }
@@ -39,21 +38,21 @@ void checkArgs(int argc, char **argv, int &numThreads, int &logId) {
     }
 }
 
-void processTransaction() {
+void processTransaction(int id) {
     while (1) {
         // lock and wait till we have a transaction to process
         unique_lock<mutex> sigLock(sigmtx);
         sig.wait(sigLock, []{return transCont.getCurrTrans() > 0;});
+        // receive the transaction
         string val = transCont.pop();
+        long n = stoi(val.substr(1));
+        transCont.writeOut(id, n, "Receive");
+        sigLock.unlock();
         // execute transaction
-        if (val[0] == 'S') {
-            Sleep(stoi(val.substr(1)));
-        } else if (val[0] == 'T') {
-            Trans(stoi(val.substr(1)));
-        } else {
-            cout << "invalid argument" << endl;
-        }
-
-        cout << "done " << val << endl;
+        transCont.helpTrans(n);
+        // need to lock io
+        sigLock.lock();
+        transCont.writeOut(id, n, "Complete");
+        transCont.writeOut(id, n, "Ask");
     }
 }
