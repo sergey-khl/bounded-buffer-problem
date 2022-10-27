@@ -34,8 +34,8 @@ int TransCont::getCurrTrans() {
     return transactions.size();
 }
 
-void TransCont::setMaxQueue(int maxQueue) {
-    maxQueue = maxQueue;
+void TransCont::setMaxQueue(int mq) {
+    maxQueue = mq;
 }
 
 void TransCont::openOut(string logId) {

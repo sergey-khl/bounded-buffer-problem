@@ -7,7 +7,7 @@
 
 class TransCont {
     public:
-        void setMaxQueue(int maxQueue);
+        void setMaxQueue(int mq);
         void increment(std::string trans);
         std::string pop();
         int getMaxQueue();

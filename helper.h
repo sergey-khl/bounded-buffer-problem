@@ -4,10 +4,9 @@
 #include <condition_variable>
 #include <string>
 
-
 void checkArgs(int argc, char **argv, int &numThreads, std::string &logId);
 void processTransaction(int id);
 extern std::mutex sigmtx;
 extern std::condition_variable sig;
-extern int TransSave;
+extern bool doneInp;
 #endif

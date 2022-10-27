@@ -41,25 +41,35 @@ int main(int argc, char **argv) {
         long n = stoi(cmd.substr(1));
         // add transaction to queue
         if (cmd[0] == 'S') {
-            //Sleep(stoi(cmd.substr(1)));
-            transCont.helpSleep(n);
             transCont.writeOut(0, n, "Sleep");
+            sigLock.unlock();
+            transCont.helpSleep(n);
+            sigLock.lock();
         } else {
+            sig.wait(sigLock, []{return transCont.getCurrTrans() < transCont.getMaxQueue();});
             transCont.increment(cmd);
             transCont.writeOut(0, n, "Work");
             // signal a waiting thread to start doing stuff
+            
             sigLock.unlock();
             sig.notify_one();
             sigLock.lock();
         }
     }
+    doneInp = true;
     
     for (int i = 0; i < numThreads; i++) {
-        consumers[i].join();
+        if (consumers[i].joinable()) {
+            cout << i << endl;
+            consumers[i].join();
+        } else {
+            cout << i << "destroy" << endl;
+            consumers[i].detach();
+        }
     }
     // add end input
+    cout << "hofusdba0" << endl;
 
-    cout << "here" << endl;
     // close output File
     // transCont.closeOut();
     return(0);

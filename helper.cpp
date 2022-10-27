@@ -16,6 +16,7 @@ using namespace std;
 mutex sigmtx;
 condition_variable sig;
 TransCont transCont;
+bool doneInp = false;
 
 void checkArgs(int argc, char **argv, int &numThreads, string &logId) {
     if (argc == 3) {
@@ -39,7 +40,7 @@ void checkArgs(int argc, char **argv, int &numThreads, string &logId) {
 }
 
 void processTransaction(int id) {
-    while (1) {
+    while (!doneInp) {
         // lock and wait till we have a transaction to process
         unique_lock<mutex> sigLock(sigmtx);
         sig.wait(sigLock, []{return transCont.getCurrTrans() > 0;});
@@ -55,4 +56,5 @@ void processTransaction(int id) {
         transCont.writeOut(id, n, "Complete");
         transCont.writeOut(id, n, "Ask");
     }
+    cout << "done" << endl;
 }
