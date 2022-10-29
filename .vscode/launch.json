@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "name": "C++ Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/prodcon",
+            "args": ["1"],
+            "environment": [{ "name": "config", "value": "Debug" }],
+            "MIMode": "gdb",
+            "cwd": "${workspaceFolder}",
+        }  
+    ]
+}

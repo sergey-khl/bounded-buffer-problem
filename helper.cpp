@@ -40,10 +40,16 @@ void checkArgs(int argc, char **argv, int &numThreads, string &logId) {
 }
 
 void processTransaction(int id) {
-    while (!doneInp) {
+    while (1) {
+       
         // lock and wait till we have a transaction to process
         unique_lock<mutex> sigLock(sigmtx);
-        sig.wait(sigLock, []{return transCont.getCurrTrans() > 0;});
+        
+        sig.wait(sigLock, []{return transCont.getCurrTrans() > 0 || doneInp;});
+        if (doneInp && transCont.done()) {
+            break;
+        }
+        transCont.writeOut(id, 0, "Ask");
         // receive the transaction
         string val = transCont.pop();
         long n = stoi(val.substr(1));
@@ -54,7 +60,6 @@ void processTransaction(int id) {
         // need to lock io
         sigLock.lock();
         transCont.writeOut(id, n, "Complete");
-        transCont.writeOut(id, n, "Ask");
+        
     }
-    cout << "done" << endl;
 }

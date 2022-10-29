@@ -32,12 +32,13 @@ int main(int argc, char **argv) {
     thread consumers[numThreads];
     for (int i = 0; i < numThreads; i++) {
         consumers[i] = thread(processTransaction, i + 1);
-        transCont.writeOut(i + 1, 0, "Ask");
+        transCont.writeOut(i+1, 0, "Ask");
     }
 
     string cmd;
     while(getline(cin, cmd)) {
         unique_lock<mutex> sigLock(sigmtx);
+        transCont.incInp();
         long n = stoi(cmd.substr(1));
         // add transaction to queue
         if (cmd[0] == 'S') {
@@ -46,31 +47,31 @@ int main(int argc, char **argv) {
             transCont.helpSleep(n);
             sigLock.lock();
         } else {
-            sig.wait(sigLock, []{return transCont.getCurrTrans() < transCont.getMaxQueue();});
+            //sig.wait(sigLock, []{return transCont.getCurrTrans() < transCont.getMaxQueue();});
+            sigLock.unlock();
+            while (transCont.getCurrTrans() >= transCont.getMaxQueue()) {}
+            sigLock.lock();
             transCont.increment(cmd);
             transCont.writeOut(0, n, "Work");
             // signal a waiting thread to start doing stuff
-            
             sigLock.unlock();
             sig.notify_one();
             sigLock.lock();
         }
     }
+    unique_lock<mutex> sigLock(sigmtx);
     doneInp = true;
+    sigLock.unlock();
+    sig.notify_all();
+    
     
     for (int i = 0; i < numThreads; i++) {
-        if (consumers[i].joinable()) {
-            cout << i << endl;
-            consumers[i].join();
-        } else {
-            cout << i << "destroy" << endl;
-            consumers[i].detach();
-        }
+        consumers[i].join();
     }
     // add end input
-    cout << "hofusdba0" << endl;
+    transCont.writeSummary();
 
     // close output File
-    // transCont.closeOut();
+    transCont.closeOut();
     return(0);
 }
