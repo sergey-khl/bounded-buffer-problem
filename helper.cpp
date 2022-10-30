@@ -41,18 +41,17 @@ void checkArgs(int argc, char **argv, int &numThreads, string &logId) {
 
 void processTransaction(int id) {
     while (1) {
-       
         // lock and wait till we have a transaction to process
         unique_lock<mutex> sigLock(sigmtx);
-        
         sig.wait(sigLock, []{return transCont.getCurrTrans() > 0 || doneInp;});
-        if (doneInp && transCont.done()) {
+        // if we are done with the input then we just have to know if there any trans left, otherwise we can break
+        if (transCont.getCurrTrans() == 0) {
             break;
         }
         transCont.writeOut(id, 0, "Ask");
         // receive the transaction
-        string val = transCont.pop();
-        long n = stoi(val.substr(1));
+        string val = transCont.popTrans();
+        int n = stoi(val.substr(1));
         transCont.writeOut(id, n, "Receive");
         sigLock.unlock();
         // execute transaction
@@ -60,6 +59,5 @@ void processTransaction(int id) {
         // need to lock io
         sigLock.lock();
         transCont.writeOut(id, n, "Complete");
-        
     }
 }

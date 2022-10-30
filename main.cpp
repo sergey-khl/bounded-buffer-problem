@@ -13,6 +13,8 @@
 using namespace std;
 
 int main(int argc, char **argv) {
+    // i used mutex for critical sections and a condition variable to wait for transactions
+
     // start measuring time
     transCont.startTime();
 
@@ -37,9 +39,9 @@ int main(int argc, char **argv) {
 
     string cmd;
     while(getline(cin, cmd)) {
+        // start critical section and unlock when need to wait or execute command
         unique_lock<mutex> sigLock(sigmtx);
-        transCont.incInp();
-        long n = stoi(cmd.substr(1));
+        int n = stoi(cmd.substr(1));
         // add transaction to queue
         if (cmd[0] == 'S') {
             transCont.writeOut(0, n, "Sleep");
@@ -47,7 +49,6 @@ int main(int argc, char **argv) {
             transCont.helpSleep(n);
             sigLock.lock();
         } else {
-            //sig.wait(sigLock, []{return transCont.getCurrTrans() < transCont.getMaxQueue();});
             sigLock.unlock();
             while (transCont.getCurrTrans() >= transCont.getMaxQueue()) {}
             sigLock.lock();
@@ -59,12 +60,15 @@ int main(int argc, char **argv) {
             sigLock.lock();
         }
     }
+    // once input is ended let the threads know
     unique_lock<mutex> sigLock(sigmtx);
+    transCont.writeOut(0, 0, "End");
     doneInp = true;
     sigLock.unlock();
     sig.notify_all();
     
     
+    // join all threads for clean exit
     for (int i = 0; i < numThreads; i++) {
         consumers[i].join();
     }

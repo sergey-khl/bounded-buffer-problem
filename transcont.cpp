@@ -20,14 +20,11 @@ void TransCont::increment(string trans) {
     transactions.push(trans);
 }
 
-void TransCont::incInp() {
-    numInput += 1;
-}
 
-string TransCont::pop() {
-    string val = transactions.front();
+string TransCont::popTrans() {
+    string v = transactions.front();
     transactions.pop();
-    return val;
+    return v;
 }
 
 int TransCont::getMaxQueue() {
@@ -38,13 +35,6 @@ int TransCont::getCurrTrans() {
     return transactions.size();
 }
 
-bool TransCont::done() {
-    if (numInput == summary["Total"]) {
-        return true;
-    } else {
-        return false;
-    }
-}
 
 void TransCont::setMaxQueue(int mq) {
     maxQueue = mq;
@@ -95,7 +85,7 @@ void TransCont::writeOut(int id, long n, string cmd) {
         snprintf(outbuf, 100, "%.3f ID= %i      ", elapsed, id);
     }
     out << outbuf << setw(15) << std::left << cmd;
-    if (cmd != "Ask") {
+    if (cmd != "Ask" && cmd != "End") {
         out << n;
     }
     out << '\n';
@@ -124,10 +114,10 @@ void TransCont::closeOut() {
     out.close();
 }
 
-void TransCont::helpSleep(long n) {
+void TransCont::helpSleep(int n) {
     Sleep(n);
 }
 
-void TransCont::helpTrans(long n) {
+void TransCont::helpTrans(int n) {
     Trans(n);
 }

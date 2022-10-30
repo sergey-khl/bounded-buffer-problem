@@ -1,5 +1,5 @@
 prodcon: main.o helper.o transcont.o
-	g++ -g -o prodcon main.o transcont.o  helper.o -lpthread
+	g++ -O -o prodcon main.o transcont.o  helper.o -lpthread
 
 helper.o: helper.cpp helper.h transcont.h
 	g++ -c helper.cpp -o helper.o

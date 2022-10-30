@@ -10,22 +10,19 @@ class TransCont {
     public:
         void setMaxQueue(int mq);
         void increment(std::string trans);
-        void incInp();
-        std::string pop();
+        std::string popTrans();
         int getMaxQueue();
         int getCurrTrans();
-        bool done();
         void openOut(std::string logId);
         void closeOut();
         void startTime();
         void writeOut(int id, long n, std::string cmd);
         void writeSummary();
-        void helpSleep(long n);
-        void helpTrans(long n);
+        void helpSleep(int n);
+        void helpTrans(int n);
     private:
         struct timeval begin, end;
         int maxQueue;
-        int numInput = 0;
         std::queue<std::string> transactions;
         std::ofstream out;
         std::map<std::string, int> summary;
